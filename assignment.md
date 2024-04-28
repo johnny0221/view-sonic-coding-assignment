@@ -8,7 +8,7 @@
 
 You can accomplish this task using any JavaScript framework you like, or even with pure JavaScript.
 
-![task1](./src/assets/task1.png)
+![task1](./task1.png)
 
 - Outer frame: Width 400px, no height limit, with border "1px solid red".
 - Inner element: 2 buttons, 1 text field, you can arrange them as you like.
