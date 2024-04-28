@@ -9,6 +9,8 @@ function1 is a generator function (also known as a saga in redux-saga) to handle
 
 However, since the call effect is a blocking effect, we may not be able to abort it during the request.
 
+---
+
 2. Can we stop what "function1" is doing? How?
 
 We can leverage the fork effect and cancel effect to stop function1's ongoing request, unlike call effect the fork effect brings a non-blocking behavior and the cancel effect provides a signal to cancel the request
@@ -21,7 +23,7 @@ below are the brief description of how we can achieve stopping function1's reque
 
 The implementation of the above description will be in the third question
 
-
+---
 
 3. How to optimize this snippet?
 
@@ -40,6 +42,7 @@ function* function1Request(config) {
          return;
        }
     } finally {
+        // leverage the cancelled effect for handling task cancellation
         if (yield cancelled()) {
             ctrl.abort()
             yield put(/** reducer 3 */);
@@ -48,6 +51,7 @@ function* function1Request(config) {
 }
 
 function* function1() {
+    // continuously watch the saga
     while(true) {
        const {function1RequestArgs} = yield take('FUNCTION1_ACTION')
        const function1RequestTask = yield fork(function1Request, function1RequestArgs)
@@ -59,5 +63,6 @@ function* function1() {
 }
 
 function* function2() {
+    // perform a put effect here for easier unit testing since it returns an js object
     yield put({ type: 'ABORT_FUNCTION1' })
 }
