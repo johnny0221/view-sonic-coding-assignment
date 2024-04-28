@@ -30,10 +30,7 @@ const TaskTwo = () => {
     <div>
       {!isFinished && (
         <>
-          <button
-            style={{ marginRight: '10px' }}
-            className='button'
-            onClick={handleClick1}>
+          <button className='button mr-10' onClick={handleClick1}>
             Start
           </button>
           <button

@@ -4,6 +4,10 @@
   align-items: center;
 }
 
+.mr-10 {
+  margin-right: 10px;
+}
+
 .button {
   width: fit-content;
   background-color: black;
