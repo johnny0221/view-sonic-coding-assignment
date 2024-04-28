@@ -1,0 +1,43 @@
+.outer-frame {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 400px;
+  border: 1px solid red;
+  padding: 10px;
+  margin: 10px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 70% 30%;
+  grid-gap: 15px;
+  margin: 10px;
+}
+
+.grid-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.text-field__container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.button {
+  width: 80px;
+  background-color: black;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.position__end {
+  justify-self: flex-end;
+}
