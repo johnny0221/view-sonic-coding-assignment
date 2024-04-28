@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './TaskTwo.css';
 
 const TaskTwo = () => {
@@ -6,12 +6,12 @@ const TaskTwo = () => {
   const [duration, setDuration] = useState(null);
   const [isFinished, setIsFinished] = useState(false);
 
-  const handleClick1 = () => {
+  const handleClickStart = () => {
     const currentTime = new Date().getTime();
     setStartTime(currentTime);
   };
 
-  const handleClick2 = () => {
+  const handleClickEnd = () => {
     const currentTime = new Date().getTime();
     if (startTime !== null) {
       const timeDiff = (currentTime - startTime) / 1000;
@@ -30,13 +30,13 @@ const TaskTwo = () => {
     <div>
       {!isFinished && (
         <>
-          <button className='button mr-10' onClick={handleClick1}>
+          <button className='button mr-10' onClick={handleClickStart}>
             Start
           </button>
           <button
             disabled={!startTime}
             className='button'
-            onClick={handleClick2}>
+            onClick={handleClickEnd}>
             End
           </button>
         </>
