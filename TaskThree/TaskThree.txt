@@ -17,9 +17,11 @@ We can leverage the fork effect and cancel effect to stop function1's ongoing re
 
 below are the brief description of how we can achieve stopping function1's request
 
-1. First, In order to stop function1 during the POST request, one way to do it is to switch the call effect to fork effect to make it non-blocking
-2. Extract the POST request to another generator function and if you want to handle cancellation you can use the cancelled effect in the finally block
-3. Next, refactor function1 listen to specific action using take effect, when specific action happens, we want to trigger a cancel the ongoing request
+1. First, create a function1Watcher generator listenting to the action to trigger function1
+2. Second, leverage the fork effect to execute function1 for non-blocking behavior, then use the take effect to listen any ABORT_FUNCTION1 action
+3. We will execute a cancel effect when we receive the ABORT_FUNCTION1 action
+4. If fork effect is ongoing, The block of code in the finally block inside function1 will be executed to abort the request when receiving the ABORT_FUNCTION1
+5. If fork effect is finished, will do nothing
 
 The implementation of the above description will be in the third question
 
@@ -27,10 +29,16 @@ The implementation of the above description will be in the third question
 
 3. How to optimize this snippet?
 
-function* function1Request(config) {
+function* function1(action) {
     const ctrl = new AbortController();
+    const config = {
+        method: 'POST',
+        url: 'https://some-endpoint-url.com',
+        data: action.payload,
+        signal: ctrl.signal,
+    };
     try {
-        // do the axios request here
+        const { data } = yield call(/** a axios request with config */);
 
         yield put(/** reducer 1 */);
     } catch(e) {
@@ -50,14 +58,14 @@ function* function1Request(config) {
     }
 }
 
-function* function1() {
+function* function1Watcher() {
     // continuously watch the saga
     while(true) {
-       const {function1RequestArgs} = yield take('FUNCTION1_ACTION')
-       const function1RequestTask = yield fork(function1Request, function1RequestArgs)
+       const {function1Args} = yield take('FUNCTION1_ACTION')
+       const function1Task = yield fork(function1, function1Args)
        const action = yield take('ABORT_FUNCTION1')
        if (action.type === 'ABORT_FUNCTION1') {
-         yield cancel(function1RequestTask)
+         yield cancel(function1Task)
        }
     }
 }
