@@ -1,0 +1,63 @@
+1. Simply describe what "function1" will do.
+
+function1 is a generator function (also known as a saga in redux-saga) to handle a side effect, It does the following work
+1. creates two variables initially, an AbortController for aborting the request and POST request config
+2. First, it executes a call effect in redux-saga for performing the POST request, since the call effect is a blocking effect, we will have to wait the request to be finished before executing the next line
+3. If the request succeed, execute a put effect, it will be caught by the redux-saga middleware for dispatching an success action
+4. If the request failed, execute another put effect, it will be caught by the redux-saga middleware for dispatching an failure action
+5. Execute another put effect in the final block if the user aborts the signal
+
+However, since the call effect is a blocking effect, we may not be able to abort it during the request.
+
+2. Can we stop what "function1" is doing? How?
+
+We can leverage the fork effect and cancel effect to stop function1's ongoing request, unlike call effect the fork effect brings a non-blocking behavior and the cancel effect provides a signal to cancel the request
+
+below are the brief description of how we can achieve stopping function1's request
+
+1. First, In order to stop function1 during the POST request, one way to do it is to switch the call effect to fork effect to make it non-blocking
+2. Extract the POST request to another generator function and if you want to handle cancellation you can use the cancelled effect in the finally block
+3. Next, refactor function1 listen to specific action using take effect, when specific action happens, we want to trigger a cancel the ongoing request
+
+The implementation of the above description will be in the third question
+
+
+
+3. How to optimize this snippet?
+
+function* function1Request(config) {
+    const ctrl = new AbortController();
+    try {
+        // do the axios request here
+
+        yield put(/** reducer 1 */);
+    } catch(e) {
+       if (e.response) {
+         const er = e.response;
+
+         yield put(/** reducer 2 */);
+
+         return;
+       }
+    } finally {
+        if (yield cancelled()) {
+            ctrl.abort()
+            yield put(/** reducer 3 */);
+        }
+    }
+}
+
+function* function1() {
+    while(true) {
+       const {function1RequestArgs} = yield take('FUNCTION1_ACTION')
+       const function1RequestTask = yield fork(function1Request, function1RequestArgs)
+       const action = yield take('ABORT_FUNCTION1')
+       if (action.type === 'ABORT_FUNCTION1') {
+         yield cancel(function1RequestTask)
+       }
+    }
+}
+
+function* function2() {
+    yield put({ type: 'ABORT_FUNCTION1' })
+}
